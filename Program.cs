@@ -6,7 +6,12 @@ namespace Dungeon_Starcraft
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Game Game = new Game();
+            Game.Start();
+            Unit MainHero = new Unit();
+            //Нужно вывести список сейвов и дать выбор пользователю
+            Game.Load("Save#1");
+
         }
     }
 }
