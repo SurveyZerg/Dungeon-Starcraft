@@ -13,3 +13,11 @@ obj/Dungeon Starcraft.csproj.nuget.dgspec.json
 obj/Dungeon Starcraft.csproj.nuget.g.props
 obj/Dungeon Starcraft.csproj.nuget.g.targets
 obj/project.assets.json
+obj/Debug/netcoreapp2.1/Dungeon Starcraft.csproj.FileListAbsolute.txt
+obj/Debug/netcoreapp2.1/Dungeon Starcraft.dll
+obj/Debug/netcoreapp2.1/Dungeon Starcraft.pdb
+bin/Debug/netcoreapp2.1/Dungeon Starcraft.deps.json
+bin/Debug/netcoreapp2.1/Dungeon Starcraft.dll
+bin/Debug/netcoreapp2.1/Dungeon Starcraft.pdb
+bin/Debug/netcoreapp2.1/Dungeon Starcraft.runtimeconfig.dev.json
+bin/Debug/netcoreapp2.1/Dungeon Starcraft.runtimeconfig.json
