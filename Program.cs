@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Dungeon_Starcraft
 {
@@ -14,28 +15,44 @@ namespace Dungeon_Starcraft
 
             Game.BattleEventArgs.MainHero = MainHero;
 
-
-            Console.Write("1 - Начать новую игру\n2 - Загрузить игру\n3 - Выйти из игры\n");
-            int menu = Convert.ToInt32(Console.ReadLine());
-
-            if (menu == 1)
+            bool temp_menu = true;
+            while (temp_menu)
             {
-                Game.Start();
+                Console.Write("1 - Начать новую игру\n2 - Загрузить игру\n3 - Выйти из игры\n");
+                int menu = Convert.ToInt32(Console.ReadLine());
+                if (menu == 1)
+                {
+                    Game.Start();
 
-                Game.Map[0] = MainHero;
-                MainHero.Location = 0;
-                Game.Map[Game.Map.Size - 1] = Boss;
+                    Game.Map[0] = MainHero;
+                    MainHero.Location = 0;
+                    Game.Map[Game.Map.Size - 1] = Boss;
+                    Boss.Location = 9;
 
-                NewGame(Game, MainHero);
-            }
-            else if (menu == 2)
-            {
-                //Нужно вывести список сейвов и дать выбор пользователю
-                Game.Load("Save#1");
-            }
-            else if (menu == 3)
-            {
+                    NewGame(Game, MainHero);
 
+                    temp_menu = false;
+                }
+                else if (menu == 2)
+                {
+                    using (StreamReader sw = new StreamReader("saves/savelog.txt"))
+                    {
+                        if (sw.ReadLine() == null)
+                        {
+                            Console.WriteLine("Сохранений не существует!\nВыберите другой пункт меню");
+                        }
+                        else
+                        {
+                            temp_menu = false;
+                        }
+                    }
+                    //Нужно вывести список сейвов и дать выбор пользователю
+                    Game.Load("Save#1");
+                }
+                else if (menu == 3)
+                {
+                    Environment.Exit(0);
+                }
             }
 
             Game.OnBattleEvent += Game_OnBattleEvent;
@@ -47,7 +64,7 @@ namespace Dungeon_Starcraft
                 Console.WriteLine("-------------------------------------------");
                 if (Game.Map[Game.Map.Size - 2] != MainHero)
                 {
-                    Console.Write("Ваши действия:\n1 - Идти вперед\n");
+                    Console.WriteLine("Ваши действия:\n1 - Идти вперед\n8 - Сохраниться\n9 - Выйти из игры");
                     int turn = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine("-------------------------------------------");
                     if (turn == 1)
@@ -71,6 +88,50 @@ namespace Dungeon_Starcraft
                             Game.Map[temp.Location] = MainHero;
                             MainHero.Location++;
                         }
+                    }
+                    else if (turn == 8)
+                    {
+                        Console.WriteLine("Выберите название для сохранения");
+                        string savename = Console.ReadLine();
+                        using (StreamWriter sw = new StreamWriter($"saves/savelog.txt", true))
+                        {
+                            sw.WriteLine($"{savename}.txt");
+                        }
+                        using (StreamWriter sw = new StreamWriter($"saves/{savename}.txt"))
+                        {
+                            sw.WriteLine($"Map Size - {Game.Map.Size}");
+                            for (int i = 0; i < MainHero.Location; i++)
+                            {
+                                sw.WriteLine($"null: Location - {i}");
+                            }
+                            for (int i = MainHero.Location; i < Game.Map.Size; i++)
+                            {
+                                if (Game.Map[i] == MainHero)
+                                {
+                                    Unit temp = (Unit)Game.Map[i];
+                                    sw.WriteLine($"MainHero: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Money}, Location - {temp.Location}");
+                                }
+                                else if (Game.Map[i] == Boss)
+                                {
+                                    Unit temp = (Unit)Game.Map[i];
+                                    sw.WriteLine($"Boss: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Money}, Location - {temp.Location}");
+                                }
+                                else if (Game.Map[i] is Unit)
+                                {
+                                    Unit temp = (Unit)Game.Map[i];
+                                    sw.WriteLine($"Unit: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Money}, Location - {temp.Location}");
+                                }
+                                else if (Game.Map[i] is Loot)
+                                {
+                                    Loot temp = (Loot)Game.Map[i];
+                                    sw.WriteLine($"Loot: Gold - {temp.Money}, Location - {temp.Location}");
+                                }
+                            }
+                        }
+                    }
+                    else if (turn == 9)
+                    {
+                        Environment.Exit(0);
                     }
                 }
                 else
@@ -150,7 +211,7 @@ namespace Dungeon_Starcraft
             List<Loot> lootList = new List<Loot>();
             var rnd = new Random();
             bool loot;
-            for (int i = FindObjectOnMap(game, mainHero) + 1; i < game.Map.Size; i++)
+            for (int i = FindObjectOnMap(game, mainHero) + 1; i < game.Map.Size - 1; i++)
             {
                 loot = Convert.ToBoolean(rnd.Next(0, 2));
                 if (loot)

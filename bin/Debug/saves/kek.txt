@@ -1,0 +1,11 @@
+Map Size - 10
+null: Location - 0
+null: Location - 1
+null: Location - 2
+null: Location - 3
+null: Location - 4
+null: Location - 5
+null: Location - 6
+MainHero: Name - MainHero, HP - 92, Mana - 0, Armor - 2, Damage - 20, Gold - 542, Location - 7
+Loot: Gold - 169, Location - 8
+Boss: Name - Boss, HP - 100, Mana - 0, Armor - 5, Damage - 5, Gold - 0, Location - 9
