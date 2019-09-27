@@ -19,127 +19,38 @@ namespace Dungeon_Starcraft
             Game.OnBattleEvent += Game_OnBattleEvent;
 
 
-            bool temp_menu = true;
-            while (temp_menu)
+            using (StreamReader sr = new StreamReader("saves/savelog.txt"))
             {
-                Console.Write("1 - Начать новую игру\n2 - Загрузить игру\n3 - Выйти из игры\n");
-                int menu = Convert.ToInt32(Console.ReadLine());
-                Console.Clear();
-
-                if (menu == 1)
+                if (sr.ReadLine() == null)
                 {
-                    Game.Start(MainHero,Boss);
-                    temp_menu = false;
+                    Console.WriteLine("1 - Начать новую игру\n3 - Выйти из игры");
                 }
-                else if (menu == 2)
+                else
                 {
-                    //Game.Load();
-                    string savename = "";
-                    using (StreamReader sr = new StreamReader("saves/savelog.txt"))
-                    {
-                        if (sr.ReadLine() == null)
-                        {
-                            Console.WriteLine("Сохранений не существует!\nВыберите другой пункт меню");
-                        }
-                        else
-                        {
-                            sr.DiscardBufferedData();
-                            sr.BaseStream.Seek(0, SeekOrigin.Begin);
-                            for(int i = 0;!sr.EndOfStream;i++)
-                            {
-                                Console.WriteLine($"{i+1} - {sr.ReadLine()}");
-                            }
-                            Console.Write("Выбери номер сохранения - ");
-                            int saveNumber = Convert.ToInt32(Console.ReadLine());
-                            sr.DiscardBufferedData();
-                            sr.BaseStream.Seek(0, SeekOrigin.Begin);
-                            for (int i = 1; i < saveNumber;i++)
-                            {
-                                sr.ReadLine();
-                            }
-                            savename = sr.ReadLine();
-                            
-                            temp_menu = false;
-                        }
-                    }
-                    if (!temp_menu)
-                    {
-                        using (StreamReader sr = new StreamReader($"saves/{savename}"))
-                        {
-                            //Поиск размера
-                            string temp = sr.ReadLine();
-                            temp = temp.Remove(0, (temp.IndexOf("-") + 2));
-                            Game.Map.Size = Convert.ToInt32(temp);
-                            //
-
-                            //Поиск всего, что лежит на карте
-                            for (int i = 0; !sr.EndOfStream; i++)
-                            {
-                                temp = sr.ReadLine();
-                                if (temp.Contains("null"))
-                                {
-                                    Game.Map[i] = null;
-                                }
-                                else
-                                {
-                                    string typeOfObject = temp.Substring(0, temp.IndexOf(":"));
-                                    if (typeOfObject == "MainHero" || typeOfObject == "Boss" || typeOfObject == "Unit")
-                                    {
-                                        Unit a = (Unit)Game.Map[i];
-                                        List<string> attributes = new List<string>();
-                                        for (int j = 0; temp != "";j++)
-                                        {
-                                            temp = temp.Remove(0, (temp.IndexOf("-") + 2));
-                                            attributes.Add(temp.Substring(0, temp.IndexOf(",")));
-                                            temp = temp.Remove(0, (temp.IndexOf(",") + 2));
-                                            Console.WriteLine(attributes[j]);
-                                            Console.WriteLine(temp);
-                                        }
-                                        a = new Unit(attributes[0], Convert.ToInt32(attributes[1]), Convert.ToInt32(attributes[2]), Convert.ToInt32(attributes[3]), Convert.ToInt32(attributes[4]));
-                                        //Спорно, а остается ли та же ссылка
-                                        a.Money = Convert.ToInt32(attributes[5]);
-                                        a.Location = Convert.ToInt32(attributes[6]);
-                                        Game.Map[i] = a;
-                                    }
-                                    else if (typeOfObject == "Loot")
-                                    {
-                                        Loot a = (Loot)Game.Map[i];
-                                        List<string> attributes = new List<string>();
-                                        for (int j = 0; temp != ""; j++)
-                                        {
-                                            temp = temp.Remove(0, (temp.IndexOf("-") + 2));
-                                            attributes.Add(temp.Substring(0, temp.IndexOf(",")));
-                                            temp = temp.Remove(0, (temp.IndexOf(",") + 2));
-                                            Console.WriteLine(attributes[j]);
-                                            Console.WriteLine(temp);
-                                        }
-                                        a = new Loot(Convert.ToInt32(attributes[0]));
-                                        //Спорно, а остается ли та же ссылка
-                                        a.Location = Convert.ToInt32(attributes[1]);
-                                        Game.Map[i] = a;
-                                    }  
-                                }
-                            }
-                        }
-                    }
-                    //Нужно вывести список сейвов и дать выбор пользователю
-                    Game.Load("Save#1");
-                }
-                else if (menu == 3)
-                {
-                    Environment.Exit(0);
+                    Console.WriteLine("1 - Начать новую игру\n2 - Загрузить игру\n3 - Выйти из игры");
                 }
             }
+            int menu = Convert.ToInt32(Console.ReadLine());
+            Console.Clear();
+
+            if (menu == 1)
+                Game.Start(ref MainHero,ref Boss);
+            else if (menu == 2)
+                Game.Load(AskSaveName(),ref MainHero,ref Boss);
+            else if (menu == 3)
+                Environment.Exit(0);
 
             while (!Game.End)
             {
                 MainHero.ShowStatus(true);
                 Console.WriteLine("-------------------------------------------");
-                if (Game.Map[Game.Map.Size - 2] != MainHero)
+                if (Game.Map[Game.Map.Size - 2] != MainHero) //Обычная ходьба по подземелью
                 {
                     Console.WriteLine("Ваши действия:\n1 - Идти вперед\n8 - Сохраниться\n9 - Выйти из игры");
                     int turn = Convert.ToInt32(Console.ReadLine());
                     Console.Clear();
+
+
                     if (turn == 1)
                     {
                         if (Game.Map[MainHero.Location + 1] is Loot)
@@ -167,48 +78,16 @@ namespace Dungeon_Starcraft
                     {
                         Console.WriteLine("Выберите название для сохранения");
                         string savename = Console.ReadLine();
-                        using (StreamWriter sw = new StreamWriter($"saves/savelog.txt", true))
-                        {
-                            sw.WriteLine($"{savename}.txt");
-                        }
-                        using (StreamWriter sw = new StreamWriter($"saves/{savename}.txt"))
-                        {
-                            sw.WriteLine($"Map Size - {Game.Map.Size}");
-                            for (int i = 0; i < MainHero.Location; i++)
-                            {
-                                sw.WriteLine($"null: Location - {i}");
-                            }
-                            for (int i = MainHero.Location; i < Game.Map.Size; i++)
-                            {
-                                if (Game.Map[i] == MainHero)
-                                {
-                                    Unit temp = (Unit)Game.Map[i];
-                                    sw.WriteLine($"MainHero: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Money}, Location - {temp.Location}, ");
-                                }
-                                else if (Game.Map[i] == Boss)
-                                {
-                                    Unit temp = (Unit)Game.Map[i];
-                                    sw.WriteLine($"Boss: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Money}, Location - {temp.Location}, ");
-                                }
-                                else if (Game.Map[i] is Unit)
-                                {
-                                    Unit temp = (Unit)Game.Map[i];
-                                    sw.WriteLine($"Unit: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Money}, Location - {temp.Location}, ");
-                                }
-                                else if (Game.Map[i] is Loot)
-                                {
-                                    Loot temp = (Loot)Game.Map[i];
-                                    sw.WriteLine($"Loot: Gold - {temp.Money}, Location - {temp.Location}, ");
-                                }
-                            }
-                        }
+                        Game.Save(savename,MainHero,Boss);
                     }
                     else if (turn == 9)
                     {
                         Environment.Exit(0);
                     }
+
+
                 }
-                else
+                else //Встреча с боссом
                 {
                     Console.Write("Впереди босс...\nВаши действия:\n1 - Идти вперед\n2 - Отдохнуть, восстановив здоровье, но дав боссу времени на приготовления\n");
                     int turn = Convert.ToInt32(Console.ReadLine());
@@ -230,7 +109,6 @@ namespace Dungeon_Starcraft
                     MainHero.Location++;
                     Game.End = true;
                 }
-
             }
         }
         static void Game_OnBattleEvent(object sender, BattleEventArgs e)
@@ -271,6 +149,27 @@ namespace Dungeon_Starcraft
                     Game.End = true;
                 }
             }
+        }
+        static string AskSaveName ()
+        {
+            int saveNumber;
+            using (StreamReader sr = new StreamReader("saves/savelog.txt"))
+            {
+                if (sr.ReadLine() == null)
+                {
+                    throw new ArgumentException("Сохранений не существует!\nНельзя позволять пользователю загружать игру, если он ни разу не сохранялся\n");
+                }
+                sr.DiscardBufferedData();
+                sr.BaseStream.Seek(0, SeekOrigin.Begin);
+                for (int i = 0; !sr.EndOfStream; i++)
+                {
+                    Console.WriteLine($"{i + 1} - {sr.ReadLine()}");
+                }
+                Console.Write("Выбери номер сохранения - ");
+                saveNumber = Convert.ToInt32(Console.ReadLine());
+                Console.Clear();
+            }
+            return Game.GetSaveName(saveNumber);
         }
     }
 }

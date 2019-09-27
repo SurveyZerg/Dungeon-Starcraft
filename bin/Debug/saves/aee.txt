@@ -1,0 +1,16 @@
+Map Size - 15
+null: Location - 0
+null: Location - 1
+null: Location - 2
+null: Location - 3
+null: Location - 4
+null: Location - 5
+MainHero: Name - MainHero, HP - 95, Mana - 0, Armor - 2, Damage - 20, Gold - 911, Location - 6, 
+Unit: Name - Enemy #3, HP - 13, Mana - 0, Armor - 2, Damage - 3, Gold - 0, Location - 7, 
+Loot: Gold - 406, Location - 8, 
+Unit: Name - Enemy #4, HP - 13, Mana - 0, Armor - 1, Damage - 6, Gold - 0, Location - 9, 
+Unit: Name - Enemy #5, HP - 5, Mana - 0, Armor - 0, Damage - 7, Gold - 0, Location - 10, 
+Loot: Gold - 2, Location - 11, 
+Unit: Name - Enemy #6, HP - 16, Mana - 0, Armor - 0, Damage - 6, Gold - 0, Location - 12, 
+Unit: Name - Enemy #7, HP - 6, Mana - 0, Armor - 1, Damage - 3, Gold - 0, Location - 13, 
+Boss: Name - Boss, HP - 100, Mana - 0, Armor - 5, Damage - 5, Gold - 0, Location - 14, 
