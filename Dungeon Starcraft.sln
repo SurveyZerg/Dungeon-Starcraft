@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dungeon Starcraft", "Dungeon Starcraft.csproj", "{2F3FF749-7D32-4E24-8105-B7F240206984}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telegram.Bot", "..\Telegram.Bot\src\Telegram.Bot\Telegram.Bot.csproj", "{9500ADD1-512B-4AAC-A03C-22B28F2834F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2F3FF749-7D32-4E24-8105-B7F240206984}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F3FF749-7D32-4E24-8105-B7F240206984}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F3FF749-7D32-4E24-8105-B7F240206984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9500ADD1-512B-4AAC-A03C-22B28F2834F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9500ADD1-512B-4AAC-A03C-22B28F2834F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9500ADD1-512B-4AAC-A03C-22B28F2834F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9500ADD1-512B-4AAC-A03C-22B28F2834F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
