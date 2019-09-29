@@ -1,0 +1,16 @@
+Map Size - 15
+null: Location - 0
+null: Location - 1
+null: Location - 2
+null: Location - 3
+null: Location - 4
+null: Location - 5
+Unit/MainHero/: Name - MainHero, HP - 91, Mana - 0, Armor - 2, Damage - 32, Gold - 100, Location - 6, 
+Unit/Spider/: Name - Spider Gay, HP - 22, Mana - 0, Armor - 1, Damage - 5, Location - 7, 
+Unit/Goblin/: Name - Mr Goblin, HP - 16, Mana - 0, Armor - 1, Damage - 6, Gold - 0, Location - 8, 
+Unit/Goblin/: Name - Mr Goblin, HP - 16, Mana - 0, Armor - 1, Damage - 6, Gold - 0, Location - 9, 
+Unit/Goblin/: Name - Mr Goblin, HP - 16, Mana - 0, Armor - 1, Damage - 6, Gold - 0, Location - 10, 
+Loot/Aura/AttackAura/: AttackBuff - 4, Location - 11, 
+Loot/Chest/: Gold - 66, Location - 12, 
+Loot/Chest/: Gold - 66, Location - 13, 
+Unit/Boss/: Name - Boss, HP - 100, Mana - 0, Armor - 5, Damage - 5, Location - 14, 

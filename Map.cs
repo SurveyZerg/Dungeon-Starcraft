@@ -12,7 +12,8 @@ namespace Dungeon_Starcraft
             get => ObjectOnMap[i];
             set => ObjectOnMap[i] = value;
         }
-        private int size = 0;
+        private int size = 1;
+        public static int MapSizeForClasses = 1;
         public int Size
         {
             get
@@ -25,11 +26,9 @@ namespace Dungeon_Starcraft
                 {
                     size = value;
                     Array.Resize(ref ObjectOnMap, size);
+                    MapSizeForClasses = value;
                 }
             }
-        }
-        public Map()
-        {
         }
     }
 }

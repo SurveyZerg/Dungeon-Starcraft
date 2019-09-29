@@ -6,7 +6,7 @@ namespace Dungeon_Starcraft
 {
     class BattleEventArgs : EventArgs
     {
-        public Unit MainHero;
+        public MainHero MainHero;
         public Unit Enemy;
     }
     class Game
@@ -20,7 +20,7 @@ namespace Dungeon_Starcraft
 
         public Map Map = new Map();
 
-        public void Start(ref Unit mainHero,ref Unit boss)
+        public void Start(ref MainHero mainHero,ref Boss boss)
         {
             var rnd = new Random();
             Map.Size = rnd.Next(10,20);
@@ -46,20 +46,26 @@ namespace Dungeon_Starcraft
                 loot = Convert.ToBoolean(rnd.Next(0, 2));
                 if (loot)
                 {
-                    lootList.Add(new Loot(rnd.Next(0, 501)));
+                    bool chest = Convert.ToBoolean(rnd.Next(0, 2));
+                    if(chest)
+                        lootList.Add(new Chest(i));
+                    else
+                        lootList.Add(new AttackAura(i));
                     Map[i] = lootList[lootList.Count - 1];
-                    lootList[lootList.Count - 1].Location = i;
                 }
                 else
                 {
-                    unitsList.Add(new Unit($"Enemy #{unitsList.Count + 1}", rnd.Next(5, 21), 0, rnd.Next(0, 3), rnd.Next(3, 8)));
+                    bool goblin = Convert.ToBoolean(rnd.Next(0, 2));
+                    if (goblin)
+                        unitsList.Add(new Goblin(i));
+                    else
+                        unitsList.Add(new Spider(i));
                     Map[i] = unitsList[unitsList.Count - 1];
-                    unitsList[unitsList.Count - 1].Location = i;
                 }
             }
         }
 
-        public void Load(string savename,ref Unit mainHero,ref Unit boss)
+        public void Load(string savename,ref MainHero mainHero,ref Boss boss)
         {
             using (StreamReader sr = new StreamReader($"saves/{savename}"))
             {
@@ -79,9 +85,31 @@ namespace Dungeon_Starcraft
                     }
                     else
                     {
-                        string typeOfObject = buff.Substring(0, buff.IndexOf(":"));
-                        Unit a = (Unit)Map[i];
-                        Loot b = (Loot)Map[i];
+                        string typeOfObject_Main = buff.Substring(0, buff.IndexOf("/"));
+                        buff = buff.Remove(0, (buff.IndexOf("/") + 1));
+                        string typeOfObject_1 = "", typeOfObject_2 = ""; //Если создаются новые ветки наследования объектов, то сюда просто новое
+                        if (typeOfObject_Main == "Unit")
+                        {
+                            typeOfObject_1 = buff.Substring(0, buff.IndexOf("/"));
+                            buff = buff.Remove(0, (buff.IndexOf(":") + 2));
+                        }
+                        else if (typeOfObject_Main == "Loot")
+                        {
+                            typeOfObject_1 = buff.Substring(0, buff.IndexOf("/"));
+                            if (typeOfObject_1 == "Chest")
+                            {
+                                buff = buff.Remove(0, (buff.IndexOf(":") + 2));
+                            }
+                            else if (typeOfObject_1 == "Aura")
+                            {
+                                buff = buff.Remove(0, (buff.IndexOf("/") + 1));
+                                typeOfObject_2 = buff.Substring(0, buff.IndexOf("/"));
+                                if (typeOfObject_2 == "AttackAura")
+                                {
+                                    buff = buff.Remove(0, (buff.IndexOf(":") + 2));
+                                }
+                            }
+                        }
                         List<string> attributes = new List<string>();
                         for (int j = 0; buff != ""; j++)
                         {
@@ -91,23 +119,55 @@ namespace Dungeon_Starcraft
                         }
 
 
-                        if (typeOfObject == "MainHero" || typeOfObject == "Boss" || typeOfObject == "Unit")
+                        if (typeOfObject_Main == "Unit")
                         {
-                            a = new Unit(attributes[0], Convert.ToInt32(attributes[1]), Convert.ToInt32(attributes[2]), Convert.ToInt32(attributes[3]), Convert.ToInt32(attributes[4]));
-                            a.Money = Convert.ToInt32(attributes[5]);
-                            a.Location = Convert.ToInt32(attributes[6]);
-                            Map[i] = a;
-                            //Костыль для босса и героя
-                            if (typeOfObject == "MainHero")
-                                mainHero = a;
-                            else if (typeOfObject == "Boss")
-                                boss = a;
+                            if (typeOfObject_1 == "MainHero")
+                            {
+                                MainHero temp = (MainHero)Map[i];
+                                temp = new MainHero(attributes[0], Convert.ToInt32(attributes[1]), Convert.ToInt32(attributes[2]), Convert.ToInt32(attributes[3]), Convert.ToInt32(attributes[4]), Convert.ToInt32(attributes[5]), Convert.ToInt32(attributes[6]));
+                                Map[i] = temp;
+                                mainHero = temp;
+                            }
+                            else if (typeOfObject_1 == "Boss")
+                            {
+                                Boss temp = (Boss)Map[i];
+                                temp = new Boss(attributes[0], Convert.ToInt32(attributes[1]), Convert.ToInt32(attributes[2]), Convert.ToInt32(attributes[3]), Convert.ToInt32(attributes[4]), Convert.ToInt32(attributes[5]));
+                                Map[i] = temp;
+                                boss = temp;
+                            }
+                            else
+                            {
+                                if (typeOfObject_1 == "Goblin")
+                                {
+                                    Goblin temp = (Goblin)Map[i];
+                                    temp = new Goblin(attributes[0], Convert.ToInt32(attributes[1]), Convert.ToInt32(attributes[2]), Convert.ToInt32(attributes[3]), Convert.ToInt32(attributes[4]), Convert.ToInt32(attributes[5]), Convert.ToInt32(attributes[6]));
+                                    Map[i] = temp;
+                                }
+                                else if (typeOfObject_1 == "Spider")
+                                {
+                                    Spider temp = (Spider)Map[i];
+                                    temp = new Spider(attributes[0], Convert.ToInt32(attributes[1]), Convert.ToInt32(attributes[2]), Convert.ToInt32(attributes[3]), Convert.ToInt32(attributes[4]), Convert.ToInt32(attributes[5]));
+                                    Map[i] = temp;
+                                }
+                            }
                         }
-                        else if (typeOfObject == "Loot")
+                        else if (typeOfObject_Main == "Loot")
                         {
-                            b = new Loot(Convert.ToInt32(attributes[0]));
-                            b.Location = Convert.ToInt32(attributes[1]);
-                            Map[i] = b;
+                            if (typeOfObject_1 == "Chest")
+                            {
+                                Chest temp = (Chest)Map[i];
+                                temp = new Chest(Convert.ToInt32(attributes[0]), Convert.ToInt32(attributes[1]));
+                                Map[i] = temp;
+                            }
+                            else if (typeOfObject_1 == "Aura")
+                            {
+                                if (typeOfObject_2 == "AttackAura")
+                                {
+                                    AttackAura temp = (AttackAura)Map[i];
+                                    temp = new AttackAura(Convert.ToInt32(attributes[0]), Convert.ToInt32(attributes[1]));
+                                    Map[i] = temp;
+                                }
+                            }
                         }
                     }
                 }
@@ -135,7 +195,7 @@ namespace Dungeon_Starcraft
             }
         }
 
-        public void Save(string savename, Unit MainHero, Unit Boss)
+        public void Save(string savename, MainHero mainHero, Boss boss)
         {
             using (StreamWriter sw = new StreamWriter($"saves/savelog.txt", true))
             {
@@ -144,28 +204,54 @@ namespace Dungeon_Starcraft
             using (StreamWriter sw = new StreamWriter($"saves/{savename}.txt"))
             {
                 sw.WriteLine($"Map Size - {Map.Size}");
-                for (int i = 0; i < MainHero.Location; i++)
+                for (int i = 0; i < mainHero.Location; i++)
                 {
                     sw.WriteLine($"null: Location - {i}");
                 }
-                for (int i = MainHero.Location; i < Map.Size; i++)
+                for (int i = mainHero.Location; i < Map.Size; i++)
                 {
                     if (Map[i] is Unit)
                     {
-                        Unit temp = (Unit)Map[i];
-                        string type;
-                        if (Map[i] == MainHero)
-                            type = "MainHero";
-                        else if (Map[i] == Boss)
-                            type = "Boss";
+                        if(Map[i] is MainHero)
+                        {
+                            MainHero temp = (MainHero)Map[i];
+                            sw.WriteLine($"Unit/MainHero/: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Gold}, Location - {temp.Location}, ");
+                        }
+                        else if (Map[i] is Boss)
+                        {
+                            Boss temp = (Boss)Map[i];
+                            sw.WriteLine($"Unit/Boss/: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Location - {temp.Location}, ");
+                        }
                         else
-                            type = "Unit";
-                        sw.WriteLine($"{type}: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Money}, Location - {temp.Location}, ");
+                        {
+                            //Все рядовые мобы
+                            if (Map[i] is Goblin)
+                            {
+                                Goblin temp = (Goblin)Map[i];
+                                sw.WriteLine($"Unit/Goblin/: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Gold - {temp.Gold}, Location - {temp.Location}, ");
+                            }
+                            else if (Map[i] is Spider)
+                            {
+                                Spider temp = (Spider)Map[i];
+                                sw.WriteLine($"Unit/Spider/: Name - {temp.Name}, HP - {temp.HP}, Mana - {temp.Mana}, Armor - {temp.Armor}, Damage - {temp.Damage}, Location - {temp.Location}, ");
+                            }
+                        }
                     }
                     else if (Map[i] is Loot)
                     {
-                        Loot temp = (Loot)Map[i];
-                        sw.WriteLine($"Loot: Gold - {temp.Money}, Location - {temp.Location}, ");
+                        if (Map[i] is Chest)
+                        {
+                            Chest temp = (Chest)Map[i];
+                            sw.WriteLine($"Loot/Chest/: Gold - {temp.Gold}, Location - {temp.Location}, ");
+                        }
+                        else if (Map[i] is Aura)
+                        {
+                            if (Map[i] is AttackAura)
+                            {
+                                AttackAura temp = (AttackAura)Map[i];
+                                sw.WriteLine($"Loot/Aura/AttackAura/: AttackBuff - {temp.AttackBuff}, Location - {temp.Location}, ");
+                            }
+                        }
                     }
                 }
             }

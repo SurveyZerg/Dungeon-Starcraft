@@ -11,8 +11,8 @@ namespace Dungeon_Starcraft
         {
             var Game = new Game();
 
-            var MainHero = new Unit("MainHero", 100, 0, 2, 20);
-            var Boss = new Unit("Boss", 100, 0, 5, 5);
+            var MainHero = new MainHero("MainHero", 100, 0, 2, 20,100,0);
+            var Boss = new Boss("Boss", 100, 0, 5, 5, Game.Map.Size - 1);
 
 
             Game.BattleEventArgs.MainHero = MainHero;
@@ -42,7 +42,7 @@ namespace Dungeon_Starcraft
 
             while (!Game.End)
             {
-                MainHero.ShowStatus(true);
+                MainHero.ShowStatus();
                 Console.WriteLine("-------------------------------------------");
                 if (Game.Map[Game.Map.Size - 2] != MainHero) //Обычная ходьба по подземелью
                 {
@@ -55,12 +55,27 @@ namespace Dungeon_Starcraft
                     {
                         if (Game.Map[MainHero.Location + 1] is Loot)
                         {
-                            Loot temp = (Loot)Game.Map[MainHero.Location + 1];
-                            Console.Write($"Вы нашли золото!\n+{temp.Money} золота\n");
-                            Console.WriteLine("-------------------------------------------");
-                            MainHero.Money += temp.Money;
-                            Game.Map[temp.Location] = MainHero;
-                            MainHero.Location++;
+                            if (Game.Map[MainHero.Location + 1] is Chest)
+                            {
+                                Chest temp = (Chest)Game.Map[MainHero.Location + 1];
+                                Console.Write($"Вы нашли золото!\n+{temp.Gold} золота\n");
+                                Console.WriteLine("-------------------------------------------");
+                                MainHero.Gold += temp.Gold;
+                                Game.Map[temp.Location] = MainHero;
+                                MainHero.Location++;
+                            }
+                            else if (Game.Map[MainHero.Location + 1] is Aura)
+                            {
+                                if (Game.Map[MainHero.Location + 1] is AttackAura)
+                                {
+                                    AttackAura temp = (AttackAura)Game.Map[MainHero.Location + 1];
+                                    Console.Write($"Вы обнаружили алтарь древних Богов Войны!\n+{temp.AttackBuff} к урону\n");
+                                    Console.WriteLine("-------------------------------------------");
+                                    MainHero.Damage += temp.AttackBuff;
+                                    Game.Map[temp.Location] = MainHero;
+                                    MainHero.Location++;
+                                }
+                            }
                         }
                         else if (Game.Map[MainHero.Location + 1] is Unit)
                         {
